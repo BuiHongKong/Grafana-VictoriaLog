@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  victorialogs:
+    image: victoriametrics/victoria-logs:v1.3.0
+    container_name: victorialogs
+    ports:
+      - "9428:9428"
+    volumes:
+      - victorialogs-data:/vlogsdata
+    command:
+      - "-storageDataPath=/vlogsdata"
+      - "-httpListenAddr=:9428"
+    networks:
+      - logging-network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    environment:
+      - GF_INSTALL_PLUGINS=victoriametrics-logs-datasource
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+    depends_on:
+      - victorialogs
+    networks:
+      - logging-network
+
+  golang-app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: golang-app
+    depends_on:
+      - victorialogs
+    networks:
+      - logging-network
+
+volumes:
+  victorialogs-data:
+
+networks:
+  logging-network:
+    driver: bridge
