@@ -1,7 +1,7 @@
 apiVersion: 1
 providers:
   - name: 'System Logs Dashboard'
-    folder: 'System Logs'
+    folder: 'System Logs Dashboard'
     type: file
     disableDeletion: false
     updateIntervalSeconds: 10
