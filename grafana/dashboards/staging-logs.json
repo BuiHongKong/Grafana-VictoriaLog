@@ -1,0 +1,42 @@
+{
+  "title": "Staging Logs",
+  "uid": "staging-logs-dashboard",
+  "timezone": "browser",
+  "refresh": "10s",
+  "schemaVersion": 38,
+  "panels": [
+    {
+      "type": "logs",
+      "title": "Raw Logs Output",
+      "gridPos": {
+        "h": 20,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "datasource": {
+        "type": "victoriametrics-logs-datasource",
+        "uid": "victorialogs_uid"
+      },
+      "targets": [
+        {
+          "expr": "_stream:{project=\"Project A\", env=\"staging\"}",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "showTime": true,
+        "showLabels": true,
+        "showCommonLabels": false,
+        "wrapLogMessage": false,
+        "prettifyLogMessage": false,
+        "enableLogDetails": true,
+        "sortOrder": "Descending"
+      }
+    }
+  ],
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  }
+}

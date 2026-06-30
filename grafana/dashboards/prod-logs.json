@@ -1,6 +1,6 @@
 {
-  "title": "Logs",
-  "uid": "logs-dashboard",
+  "title": "Prod Logs",
+  "uid": "prod-logs-dashboard",
   "timezone": "browser",
   "refresh": "10s",
   "schemaVersion": 38,
@@ -20,7 +20,7 @@
       },
       "targets": [
         {
-          "expr": "*",
+          "expr": "_stream:{project=\"Project A\", env=\"prod\"}",
           "refId": "A"
         }
       ],

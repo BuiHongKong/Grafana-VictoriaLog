@@ -11,7 +11,7 @@ import (
 )
 
 type LogEntry struct {
-	Job     string `json:"job"`
+	Project string `json:"project"`
 	Env     string `json:"env"`
 	Level   string `json:"level"`
 	Message string `json:"message"`
@@ -20,6 +20,7 @@ type LogEntry struct {
 }
 
 var levels = []string{"INFO", "WARN", "ERROR"}
+var envs = []string{"dev", "staging", "prod"}
 var messages = []string{
 	"User logged in",
 	"Payment processed",
@@ -34,13 +35,13 @@ func main() {
 	client := &http.Client{Timeout: 5 * time.Second}
 
 	for {
-		// Wait 10 to 15 seconds
-		sleepDuration := time.Duration(rand.Intn(6)+10) * time.Second
+		// Ngủ từ 2 đến 5 giây để sinh log nhanh hơn cho 3 môi trường
+		sleepDuration := time.Duration(rand.Intn(4)+2) * time.Second
 		time.Sleep(sleepDuration)
 
 		entry := LogEntry{
-			Job:     "golang-payment-service",
-			Env:     "dev",
+			Project: "Project A",
+			Env:     envs[rand.Intn(len(envs))],
 			Level:   levels[rand.Intn(len(levels))],
 			Message: messages[rand.Intn(len(messages))],
 			UserID:  fmt.Sprintf("%d", rand.Intn(90000)+10000),
