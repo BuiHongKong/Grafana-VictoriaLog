@@ -1,7 +1,7 @@
 apiVersion: 1
 providers:
-  - name: 'App Dashboards'
-    folder: 'Golang Logs'
+  - name: 'System Logs Dashboard'
+    folder: 'System Logs'
     type: file
     disableDeletion: false
     updateIntervalSeconds: 10

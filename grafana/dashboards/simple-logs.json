@@ -1,6 +1,6 @@
 {
-  "title": "Golang Application Logs",
-  "uid": "golang-logs-dashboard",
+  "title": "System Logs",
+  "uid": "logs-dashboard",
   "timezone": "browser",
   "refresh": "10s",
   "schemaVersion": 38,
@@ -20,7 +20,7 @@
       },
       "targets": [
         {
-          "expr": "_stream:{job=\"golang-payment-service\"}",
+          "expr": "*",
           "refId": "A"
         }
       ],
