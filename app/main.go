@@ -1,17 +1,17 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"log"
 	"math/rand"
-	"net/http"
+	"os"
 	"time"
 )
 
 type LogEntry struct {
-	Stream  string `json:"_stream"`
+	Job     string `json:"job"`
+	Env     string `json:"env"`
 	Level   string `json:"level"`
 	Message string `json:"message"`
 	UserID  string `json:"user_id"`
@@ -24,11 +24,17 @@ var (
 )
 
 func main() {
-	url := "http://victorialogs:9428/insert/jsonline"
-	
-	log.Println("Starting Log Generator...")
-	
-	client := &http.Client{Timeout: 10 * time.Second}
+	log.Println("Starting Log Generator... Writing to /var/log/app/app.log")
+
+	// Create directory if it doesn't exist
+	os.MkdirAll("/var/log/app", os.ModePerm)
+
+	// Open file for writing
+	f, err := os.OpenFile("/var/log/app/app.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		log.Fatalf("Error opening log file: %v", err)
+	}
+	defer f.Close()
 
 	for {
 		// Wait 1 to 3 seconds
@@ -36,7 +42,8 @@ func main() {
 		time.Sleep(sleepDuration)
 
 		entry := LogEntry{
-			Stream:  `{job="golang-payment-service", env="dev"}`,
+			Job:     "golang-payment-service",
+			Env:     "dev",
 			Level:   levels[rand.Intn(len(levels))],
 			Message: messages[rand.Intn(len(messages))],
 			UserID:  fmt.Sprintf("%d", rand.Intn(99999)+10000),
@@ -49,25 +56,11 @@ func main() {
 			continue
 		}
 
-		// Push to VictoriaLogs
-		req, err := http.NewRequest("POST", url, bytes.NewBuffer(payload))
-		if err != nil {
-			log.Printf("Error creating request: %v", err)
-			continue
-		}
-		req.Header.Set("Content-Type", "application/json")
+		// Write to file instead of sending via HTTP
+		f.Write(payload)
+		f.WriteString("\n")
+		f.Sync() // Ensure it's written to disk immediately
 
-		resp, err := client.Do(req)
-		if err != nil {
-			log.Printf("Error sending log: %v", err)
-			continue
-		}
-		
-		if resp.StatusCode != http.StatusNoContent && resp.StatusCode != http.StatusOK {
-			log.Printf("Unexpected status code: %d", resp.StatusCode)
-		}
-		
-		resp.Body.Close()
-		log.Printf("Sent log: %s", string(payload))
+		log.Printf("Wrote log: %s", string(payload))
 	}
 }

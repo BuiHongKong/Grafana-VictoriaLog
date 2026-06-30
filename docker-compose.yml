@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   victorialogs:
-    image: victoriametrics/victoria-logs:v1.3.0
+    image: victoriametrics/victoria-logs:v1.51.0
     container_name: victorialogs
     ports:
       - "9428:9428"
@@ -33,13 +33,27 @@ services:
       context: ./app
       dockerfile: Dockerfile
     container_name: golang-app
+    volumes:
+      - app-logs:/var/log/app
+    networks:
+      - logging-network
+
+  fluent-bit:
+    image: cr.fluentbit.io/fluent/fluent-bit:latest
+    container_name: fluent-bit
+    volumes:
+      - ./fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
+      - ./fluent-bit/parsers_custom.conf:/fluent-bit/etc/parsers_custom.conf
+      - app-logs:/var/log/app
     depends_on:
       - victorialogs
+      - golang-app
     networks:
       - logging-network
 
 volumes:
   victorialogs-data:
+  app-logs:
 
 networks:
   logging-network:
