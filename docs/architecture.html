@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kiến trúc Centralized Logging qua Endpoint</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #38bdf8;
+            --fluent: #4ade80;
+            --victoria: #facc15;
+            --grafana: #f97316;
+            --external: #ec4899;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, var(--bg-color), #020617);
+            color: var(--text-main);
+            line-height: 1.6;
+            margin: 0;
+            padding: 40px 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 950px;
+            width: 100%;
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 50px;
+            font-size: 1.1rem;
+        }
+
+        /* Flow Diagram */
+        .diagram {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 50px 0;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .node {
+            flex: 1;
+            min-width: 170px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 25px 20px;
+            text-align: center;
+            position: relative;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .node:hover {
+            transform: translateY(-5px);
+        }
+
+        .node-external { border-bottom: 4px solid var(--external); }
+        .node-fluent { border-bottom: 4px solid var(--fluent); box-shadow: 0 10px 20px rgba(74, 222, 128, 0.05); }
+        .node-victoria { border-bottom: 4px solid var(--victoria); box-shadow: 0 10px 20px rgba(250, 204, 21, 0.05); }
+        .node-grafana { border-bottom: 4px solid var(--grafana); box-shadow: 0 10px 20px rgba(249, 115, 22, 0.05); }
+
+        .node h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.2rem;
+        }
+
+        .node p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .arrow {
+            color: var(--accent);
+            font-size: 2rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.3; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.3; }
+        }
+
+        /* Content Sections */
+        .section {
+            margin-bottom: 30px;
+            padding: 25px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 16px;
+            border-left: 4px solid var(--accent);
+        }
+
+        .section h2 {
+            margin-top: 0;
+            font-size: 1.5rem;
+            color: #fff;
+        }
+
+        ul, ol {
+            padding-left: 20px;
+            margin-bottom: 0;
+        }
+
+        li {
+            margin-bottom: 12px;
+        }
+        
+        li:last-child {
+            margin-bottom: 0;
+        }
+
+        .highlight {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        code {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            color: #e2e8f0;
+        }
+
+        @media (max-width: 900px) {
+            .diagram {
+                flex-direction: column;
+            }
+            .arrow {
+                transform: rotate(90deg);
+                margin: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Hệ Thống Gom Log Tập Trung (Log Aggregator)</h1>
+        <p class="subtitle">Mở Endpoint trên Server để thu thập log từ mạng nội bộ</p>
+
+        <div class="diagram">
+            <div class="node node-external">
+                <h3>Các Nguồn Log</h3>
+                <p>Ứng dụng, Server khác bắn log qua mạng (HTTP/Forward) tới Server tập trung.</p>
+            </div>
+            <div class="arrow">➔</div>
+            <div class="node node-fluent">
+                <h3>Fluent Bit Endpoint</h3>
+                <p>Mở port (Endpoint) trên Server. Lắng nghe, nhận log và chuẩn hóa.</p>
+            </div>
+            <div class="arrow">➔</div>
+            <div class="node node-victoria">
+                <h3>VictoriaLogs</h3>
+                <p>Lưu trữ siêu tốc. Nhận dữ liệu từ Fluent Bit và ghi xuống ổ cứng.</p>
+            </div>
+            <div class="arrow">➔</div>
+            <div class="node node-grafana">
+                <h3>Grafana</h3>
+                <p>Giao diện trực quan. Truy xuất vào VictoriaLogs để vẽ biểu đồ và tìm kiếm.</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Mô hình nhận Log qua Endpoint</h2>
+            <p>Trong kiến trúc này, máy chủ nội bộ của bạn sẽ đóng vai trò như một <strong>"Trạm thu gom tập trung" (Aggregator)</strong>. Chúng ta sẽ cấu hình Fluent Bit mở ra một cổng lắng nghe (Endpoint mạng). Bất kỳ hệ thống hoặc ứng dụng nào từ bên ngoài chỉ cần bắn dữ liệu log thẳng vào địa chỉ IP và Port này.</p>
+            <ul>
+                <li><strong>Gom tụ mọi nơi:</strong> Dù hệ thống của bạn phân tán ở hàng chục Server khác nhau trong mạng nội bộ, tất cả đều có thể cấu hình để bắn log về chung một máy chủ tập trung duy nhất.</li>
+                <li><strong>Fluent Bit làm Cổng gác (Gateway):</strong> Thay vì đọc file tĩnh, Fluent Bit sẽ mở HTTP Input hoặc Forward Input để hứng dữ liệu luân chuyển liên tục qua mạng.</li>
+                <li><strong>Bảo mật:</strong> Bạn toàn quyền kiểm soát việc ai được phép bắn log vào hệ thống bằng cách cấu hình Tường lửa (Firewall) của máy chủ nội bộ.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Các bước triển khai thực tế</h2>
+            <p>Để xây dựng trạm thu log này trên máy chủ nội bộ, quy trình sẽ như sau:</p>
+            <ol>
+                <li><strong>Chuẩn bị máy chủ:</strong> Chuẩn bị một Server (Linux/Windows), gán IP tĩnh nội bộ và đảm bảo đã cài đặt Docker.</li>
+                <li><strong>Deploy Stack:</strong> Đẩy cụm dịch vụ gồm Grafana, VictoriaLogs và Fluent Bit lên máy chủ bằng Docker Compose (<code>docker compose up -d</code>).</li>
+                <li><strong>Mở Endpoint trên Fluent Bit:</strong> Cấu hình file <code>fluent-bit.conf</code>, sử dụng block <code>[INPUT]</code> dạng HTTP hoặc Forward để mở một Port (ví dụ: Port <code>8888</code>). Port này sẽ làm nhiệm vụ đón lõng dữ liệu log.</li>
+                <li><strong>Cấu hình Tường lửa (Firewall):</strong> Mở Port <code>8888</code> trên tường lửa của máy chủ để cho phép các Server khác gửi log tới, đồng thời mở Port <code>3000</code> cho giao diện Grafana.</li>
+                <li><strong>Hoàn thiện:</strong> Mọi thứ đã sẵn sàng! Bạn chỉ cần cho các ứng dụng nội bộ bắn dữ liệu vào địa chỉ <code>http://[Server-IP]:8888</code>, và mở Grafana lên để theo dõi trực tiếp.</li>
+            </ol>
+        </div>
+    </div>
+
+</body>
+</html>

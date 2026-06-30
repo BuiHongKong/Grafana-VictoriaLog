@@ -18,11 +18,25 @@ services:
     image: grafana/grafana:latest
     container_name: grafana
     environment:
-      - GF_INSTALL_PLUGINS=victoriametrics-logs-datasource
+      - GF_PLUGINS_PREINSTALL=victoriametrics-logs-datasource
     ports:
       - "3000:3000"
     volumes:
       - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+    depends_on:
+      - victorialogs
+    networks:
+      - logging-network
+
+  fluent-bit:
+    image: cr.fluentbit.io/fluent/fluent-bit:latest
+    container_name: fluent-bit
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
     depends_on:
       - victorialogs
     networks:
@@ -33,27 +47,13 @@ services:
       context: ./app
       dockerfile: Dockerfile
     container_name: golang-app
-    volumes:
-      - app-logs:/var/log/app
-    networks:
-      - logging-network
-
-  fluent-bit:
-    image: cr.fluentbit.io/fluent/fluent-bit:latest
-    container_name: fluent-bit
-    volumes:
-      - ./fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
-      - ./fluent-bit/parsers_custom.conf:/fluent-bit/etc/parsers_custom.conf
-      - app-logs:/var/log/app
     depends_on:
-      - victorialogs
-      - golang-app
+      - fluent-bit
     networks:
       - logging-network
 
 volumes:
   victorialogs-data:
-  app-logs:
 
 networks:
   logging-network:

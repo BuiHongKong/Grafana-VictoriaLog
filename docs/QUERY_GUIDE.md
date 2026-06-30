@@ -53,7 +53,7 @@ Please generate the complete project structure and code for the following compon
   - Expose port 9428.
   - Mount a volume for `/vlogsdata`.
   - Command: `-storageDataPath=/vlogsdata -httpListenAddr=:9428`.
-- **Service `grafana`**:
+- **Service `grafana`**:Fluent Bit
   - Expose port 3000.
   - Inject environment variable `GF_INSTALL_PLUGINS=victoriametrics-logs-datasource`.
   - Mount the provisioning directory to `/etc/grafana/provisioning/datasources`.

@@ -1,11 +1,12 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"log"
 	"math/rand"
-	"os"
+	"net/http"
 	"time"
 )
 
@@ -18,27 +19,23 @@ type LogEntry struct {
 	Time    string `json:"time"`
 }
 
-var (
-	levels   = []string{"info", "warn", "error"}
-	messages = []string{"Transaction failed", "User logged in", "Item added to cart", "Checkout initiated", "Payment processed"}
-)
+var levels = []string{"INFO", "WARN", "ERROR"}
+var messages = []string{
+	"User logged in",
+	"Payment processed",
+	"Item added to cart",
+	"Transaction failed",
+	"Password changed",
+}
 
 func main() {
-	log.Println("Starting Log Generator... Writing to /var/log/app/app.log")
+	log.Println("Starting Log Generator... Bắn log tới Endpoint Fluent Bit tại http://fluent-bit:8888/app.logs")
 
-	// Create directory if it doesn't exist
-	os.MkdirAll("/var/log/app", os.ModePerm)
-
-	// Open file for writing
-	f, err := os.OpenFile("/var/log/app/app.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	if err != nil {
-		log.Fatalf("Error opening log file: %v", err)
-	}
-	defer f.Close()
+	client := &http.Client{Timeout: 5 * time.Second}
 
 	for {
-		// Wait 1 to 3 seconds
-		sleepDuration := time.Duration(rand.Intn(3)+1) * time.Second
+		// Wait 10 to 15 seconds
+		sleepDuration := time.Duration(rand.Intn(6)+10) * time.Second
 		time.Sleep(sleepDuration)
 
 		entry := LogEntry{
@@ -46,21 +43,35 @@ func main() {
 			Env:     "dev",
 			Level:   levels[rand.Intn(len(levels))],
 			Message: messages[rand.Intn(len(messages))],
-			UserID:  fmt.Sprintf("%d", rand.Intn(99999)+10000),
+			UserID:  fmt.Sprintf("%d", rand.Intn(90000)+10000),
 			Time:    time.Now().UTC().Format(time.RFC3339),
 		}
 
 		payload, err := json.Marshal(entry)
 		if err != nil {
-			log.Printf("Error marshaling log entry: %v", err)
+			log.Printf("Lỗi tạo JSON: %v", err)
 			continue
 		}
 
-		// Write to file instead of sending via HTTP
-		f.Write(payload)
-		f.WriteString("\n")
-		f.Sync() // Ensure it's written to disk immediately
+		// Gửi POST request tới Fluent Bit Endpoint
+		req, err := http.NewRequest("POST", "http://fluent-bit:8888/app.logs", bytes.NewBuffer(payload))
+		if err != nil {
+			log.Printf("Lỗi tạo request: %v", err)
+			continue
+		}
+		req.Header.Set("Content-Type", "application/json")
 
-		log.Printf("Wrote log: %s", string(payload))
+		resp, err := client.Do(req)
+		if err != nil {
+			log.Printf("Lỗi khi bắn log tới Fluent Bit: %v", err)
+			continue
+		}
+		
+		if resp.StatusCode >= 200 && resp.StatusCode < 300 {
+			log.Printf("Đã bắn log thành công: %s", string(payload))
+		} else {
+			log.Printf("Bắn log thất bại. Status code: %d", resp.StatusCode)
+		}
+		resp.Body.Close()
 	}
 }
