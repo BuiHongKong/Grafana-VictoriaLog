@@ -42,4 +42,3 @@ To stop the services and also remove the persistent data volume (this deletes al
 ```bash
 docker compose down -v
 ```
-check
