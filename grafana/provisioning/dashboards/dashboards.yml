@@ -6,4 +6,18 @@ providers:
     disableDeletion: false
     updateIntervalSeconds: 10
     options:
-      path: /var/lib/grafana/dashboards
+      path: /var/lib/grafana/dashboards/project-a
+  - name: 'Project B Dashboards'
+    folder: 'Project B'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 10
+    options:
+      path: /var/lib/grafana/dashboards/project-b
+  - name: 'Project C Dashboards'
+    folder: 'Project C'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 10
+    options:
+      path: /var/lib/grafana/dashboards/project-c

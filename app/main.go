@@ -21,6 +21,7 @@ type LogEntry struct {
 
 var levels = []string{"INFO", "WARN", "ERROR"}
 var envs = []string{"dev", "staging", "prod"}
+var projects = []string{"Project A", "Project B", "Project C"}
 var messages = []string{
 	"User logged in",
 	"Payment processed",
@@ -40,7 +41,7 @@ func main() {
 		time.Sleep(sleepDuration)
 
 		entry := LogEntry{
-			Project: "Project A",
+			Project: projects[rand.Intn(len(projects))],
 			Env:     envs[rand.Intn(len(envs))],
 			Level:   levels[rand.Intn(len(levels))],
 			Message: messages[rand.Intn(len(messages))],
