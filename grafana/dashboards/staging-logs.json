@@ -20,7 +20,7 @@
       },
       "targets": [
         {
-          "expr": "_stream:{project=\"Project A\", env=\"staging\"}",
+          "expr": "project:\"Project A\" AND env:\"staging\"",
           "refId": "A"
         }
       ],
