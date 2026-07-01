@@ -1,0 +1,20 @@
+# Thông tin nhạy cảm (Secrets)
+.env
+*.env.local
+
+# Dữ liệu Docker (Volumes - Tránh vô tình commit log và database lên Git)
+victorialogs-data/
+grafana-data/
+postgres-data/
+keycloak-data/
+
+# File tạm của Hệ điều hành và IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# File thực thi của Go (Nếu build app cục bộ)
+app/app
+app/*.exe
