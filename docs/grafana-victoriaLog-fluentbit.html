@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -84,10 +85,24 @@
             transform: translateY(-5px);
         }
 
-        .node-external { border-bottom: 4px solid var(--external); }
-        .node-fluent { border-bottom: 4px solid var(--fluent); box-shadow: 0 10px 20px rgba(74, 222, 128, 0.05); }
-        .node-victoria { border-bottom: 4px solid var(--victoria); box-shadow: 0 10px 20px rgba(250, 204, 21, 0.05); }
-        .node-grafana { border-bottom: 4px solid var(--grafana); box-shadow: 0 10px 20px rgba(249, 115, 22, 0.05); }
+        .node-external {
+            border-bottom: 4px solid var(--external);
+        }
+
+        .node-fluent {
+            border-bottom: 4px solid var(--fluent);
+            box-shadow: 0 10px 20px rgba(74, 222, 128, 0.05);
+        }
+
+        .node-victoria {
+            border-bottom: 4px solid var(--victoria);
+            box-shadow: 0 10px 20px rgba(250, 204, 21, 0.05);
+        }
+
+        .node-grafana {
+            border-bottom: 4px solid var(--grafana);
+            box-shadow: 0 10px 20px rgba(249, 115, 22, 0.05);
+        }
 
         .node h3 {
             margin: 0 0 10px 0;
@@ -107,9 +122,20 @@
         }
 
         @keyframes pulse {
-            0% { transform: scale(1); opacity: 0.3; }
-            50% { transform: scale(1.1); opacity: 1; }
-            100% { transform: scale(1); opacity: 0.3; }
+            0% {
+                transform: scale(1);
+                opacity: 0.3;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 0.3;
+            }
         }
 
         /* Content Sections */
@@ -127,7 +153,8 @@
             color: #fff;
         }
 
-        ul, ol {
+        ul,
+        ol {
             padding-left: 20px;
             margin-bottom: 0;
         }
@@ -135,7 +162,7 @@
         li {
             margin-bottom: 12px;
         }
-        
+
         li:last-child {
             margin-bottom: 0;
         }
@@ -157,6 +184,7 @@
             .diagram {
                 flex-direction: column;
             }
+
             .arrow {
                 transform: rotate(90deg);
                 margin: 10px 0;
@@ -164,6 +192,7 @@
         }
     </style>
 </head>
+
 <body>
 
     <div class="container">
@@ -194,11 +223,16 @@
 
         <div class="section">
             <h2>Mô hình nhận Log qua Endpoint</h2>
-            <p>Trong kiến trúc này, máy chủ nội bộ của bạn sẽ đóng vai trò như một <strong>"Trạm thu gom tập trung" (Aggregator)</strong>. Chúng ta sẽ cấu hình Fluent Bit mở ra một cổng lắng nghe (Endpoint mạng). Bất kỳ hệ thống hoặc ứng dụng nào từ bên ngoài chỉ cần bắn dữ liệu log thẳng vào địa chỉ IP và Port này.</p>
+            <p>Trong kiến trúc này, máy chủ nội bộ của bạn sẽ đóng vai trò như một <strong>"Trạm thu gom tập trung"
+                    (Aggregator)</strong>. Chúng ta sẽ cấu hình Fluent Bit mở ra một cổng lắng nghe (Endpoint mạng). Bất
+                kỳ hệ thống hoặc ứng dụng nào từ bên ngoài chỉ cần bắn dữ liệu log thẳng vào địa chỉ IP và Port này.</p>
             <ul>
-                <li><strong>Gom tụ mọi nơi:</strong> Dù hệ thống của bạn phân tán ở hàng chục Server khác nhau trong mạng nội bộ, tất cả đều có thể cấu hình để bắn log về chung một máy chủ tập trung duy nhất.</li>
-                <li><strong>Fluent Bit làm Cổng gác (Gateway):</strong> Thay vì đọc file tĩnh, Fluent Bit sẽ mở HTTP Input hoặc Forward Input để hứng dữ liệu luân chuyển liên tục qua mạng.</li>
-                <li><strong>Bảo mật:</strong> Bạn toàn quyền kiểm soát việc ai được phép bắn log vào hệ thống bằng cách cấu hình Tường lửa (Firewall) của máy chủ nội bộ.</li>
+                <li><strong>Gom tụ mọi nơi:</strong> Dù hệ thống của bạn phân tán ở hàng chục Server khác nhau trong
+                    mạng nội bộ, tất cả đều có thể cấu hình để bắn log về chung một máy chủ tập trung duy nhất.</li>
+                <li><strong>Fluent Bit làm Cổng gác (Gateway):</strong> Thay vì đọc file tĩnh, Fluent Bit sẽ mở HTTP
+                    Input hoặc Forward Input để hứng dữ liệu luân chuyển liên tục qua mạng.</li>
+                <li><strong>Bảo mật:</strong> Bạn toàn quyền kiểm soát việc ai được phép bắn log vào hệ thống bằng cách
+                    cấu hình Tường lửa (Firewall) của máy chủ nội bộ.</li>
             </ul>
         </div>
 
@@ -206,14 +240,60 @@
             <h2>Các bước triển khai thực tế</h2>
             <p>Để xây dựng trạm thu log này trên máy chủ nội bộ, quy trình sẽ như sau:</p>
             <ol>
-                <li><strong>Chuẩn bị máy chủ:</strong> Chuẩn bị một Server (Linux/Windows), gán IP tĩnh nội bộ và đảm bảo đã cài đặt Docker.</li>
-                <li><strong>Deploy Stack:</strong> Đẩy cụm dịch vụ gồm Grafana, VictoriaLogs và Fluent Bit lên máy chủ bằng Docker Compose (<code>docker compose up -d</code>).</li>
-                <li><strong>Mở Endpoint trên Fluent Bit:</strong> Cấu hình file <code>fluent-bit.conf</code>, sử dụng block <code>[INPUT]</code> dạng HTTP hoặc Forward để mở một Port (ví dụ: Port <code>8888</code>). Port này sẽ làm nhiệm vụ đón lõng dữ liệu log.</li>
-                <li><strong>Cấu hình Tường lửa (Firewall):</strong> Mở Port <code>8888</code> trên tường lửa của máy chủ để cho phép các Server khác gửi log tới, đồng thời mở Port <code>3000</code> cho giao diện Grafana.</li>
-                <li><strong>Hoàn thiện:</strong> Mọi thứ đã sẵn sàng! Bạn chỉ cần cho các ứng dụng nội bộ bắn dữ liệu vào địa chỉ <code>http://[Server-IP]:8888</code>, và mở Grafana lên để theo dõi trực tiếp.</li>
+                <li><strong>Chuẩn bị máy chủ:</strong> Chuẩn bị một Server (Linux/Windows), gán IP tĩnh nội bộ và đảm
+                    bảo đã cài đặt Docker.</li>
+                <li><strong>Deploy Stack:</strong> Đẩy cụm dịch vụ gồm Grafana, VictoriaLogs và Fluent Bit lên máy chủ
+                    bằng Docker Compose (<code>docker compose up -d</code>).</li>
+                <li><strong>Mở Endpoint trên Fluent Bit:</strong> Cấu hình file <code>fluent-bit.conf</code>, sử dụng
+                    block <code>[INPUT]</code> dạng HTTP hoặc Forward để mở một Port (ví dụ: Port <code>8888</code>).
+                    Port này sẽ làm nhiệm vụ đón lõng dữ liệu log.</li>
+                <li><strong>Cấu hình Tường lửa (Firewall):</strong> Mở Port <code>8888</code> trên tường lửa của máy chủ
+                    để cho phép các Server khác gửi log tới, đồng thời mở Port <code>3000</code> cho giao diện Grafana.
+                </li>
+                <li><strong>Hoàn thiện:</strong> Mọi thứ đã sẵn sàng! Bạn chỉ cần cho các ứng dụng nội bộ bắn dữ liệu
+                    vào địa chỉ <code>http://[Server-IP]:8888</code>, và mở Grafana lên để theo dõi trực tiếp.</li>
             </ol>
+        </div>
+
+        <div class="section">
+            <h2>Phân luồng Đa Dự Án & Môi Trường</h2>
+            <p>Hệ thống hỗ trợ quản lý <strong>Multi-Project</strong> (Đa dự án) trên cùng một máy chủ duy nhất thông
+                qua cơ chế Gắn nhãn (Labeling) và Truy vấn (Query):</p>
+            <ul>
+                <li><strong>Đánh nhãn từ nguồn:</strong> Ứng dụng khi gửi log sẽ đính kèm thông tin dự án và môi trường
+                    dưới dạng chuỗi JSON (ví dụ: <code>"project": "Project A"</code>, <code>"env": "prod"</code>).</li>
+                <li><strong>Chỉ mục hóa (Indexing):</strong> Nhờ tham số <code>_stream_fields=project,env</code> cấu
+                    hình trên Fluent Bit, VictoriaLogs sẽ tự động lấy 2 trường này làm chỉ mục phân loại để tăng tốc độ
+                    tìm kiếm.</li>
+                <li><strong>Dashboard as Code:</strong> Bằng tính năng <em>Provisioning</em>, Grafana tự động sinh ra
+                    các thư mục độc lập (Project A, B, C). Trong mỗi thư mục là các Dashboard riêng cho
+                    <code>dev</code>, <code>staging</code>, <code>prod</code> sử dụng câu lệnh LogsQL(ví dụ:
+                    <code>project:"Project A" AND env:"dev"</code>).
+                </li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Màn hình Giám sát Tổng (Global Catch-all)</h2>
+            <p>Bên cạnh việc xé nhỏ log cho từng dự án, kiến trúc còn bổ sung một <strong>Global Dashboard</strong> mang
+                tính chất quản trị tập trung:</p>
+            <ul>
+                <li><strong>Catch-all Query:</strong> Sử dụng câu lệnh Query tối giản <code>*</code> để bắt toàn bộ mọi
+                    dòng log đang chảy vào hệ thống theo thời gian thực.</li>
+                <li><strong>Orphaned Logs (Log không phân loại):</strong> Nếu một ứng dụng gửi log về bị thiếu sót thông
+                    tin (không đính kèm nhãn
+                    <code>project</code> hoặc <code>env</code>), các log này sẽ bị loại trừ khỏi các Dashboard con do
+                    không
+                    khớp điều kiện lọc. Tuy nhiên, lệnh <code>*</code> trên màn hình Global sẽ thu thập và hiển thị đầy
+                    đủ chúng. Nhờ vậy, đội ngũ
+                    quản trị hệ thống (SysAdmin) có thể kịp thời phát hiện các sai sót trong cấu hình từ phía ứng dụng
+                    mà không lo mất mát dữ
+                    liệu.
+                </li>
+            </ul>
         </div>
     </div>
 
 </body>
-</html>
+
+</html>, các Dashboard con sẽ "tàng hình"
