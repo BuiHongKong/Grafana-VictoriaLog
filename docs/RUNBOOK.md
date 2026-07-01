@@ -1,44 +1,44 @@
-# Operational Runbook
+# Cẩm Nang Vận Hành (Runbook)
 
-## Prerequisites
-- Docker Desktop installed and running.
-- Basic knowledge of Docker commands.
+## Yêu cầu Hệ thống
+- Đã cài đặt và đang chạy Docker Desktop.
+- Có kiến thức cơ bản về các câu lệnh Docker.
 
-## How to Start the Stack
-1. Open a terminal and navigate to the root directory of this project.
-2. Build and start the containers using Docker Compose:
+## Cách Khởi động Hệ thống
+1. Mở terminal (CMD/PowerShell) và di chuyển đến thư mục gốc của dự án này.
+2. Build và khởi động các container bằng Docker Compose:
    ```bash
    docker compose up -d --build
    ```
-3. Wait a few moments for the services to initialize. Grafana might take a minute to download and install the required plugin.
+3. Chờ một lát để các dịch vụ khởi tạo. Grafana có thể mất khoảng một phút để tải xuống và cài đặt plugin cần thiết.
 
-## How to Check Container Logs
-You can monitor the logs of the individual services to ensure they are running correctly:
+## Cách Kiểm tra Log của Container
+Bạn có thể theo dõi log của từng dịch vụ để đảm bảo chúng đang hoạt động bình thường:
 
-- **Check all logs**:
+- **Xem tất cả log**:
   ```bash
   docker compose logs -f
   ```
-- **Check Golang App logs** (useful to see the generated JSON payloads):
+- **Xem log của ứng dụng Golang** (hữu ích để xem các cục dữ liệu JSON được sinh ra):
   ```bash
   docker compose logs -f golang-app
   ```
-- **Check VictoriaLogs logs**:
+- **Xem log của VictoriaLogs**:
   ```bash
   docker compose logs -f victorialogs
   ```
-- **Check Grafana logs**:
+- **Xem log của Grafana**:
   ```bash
   docker compose logs -f grafana
   ```
 
-## How to Stop & Clean Up
-To stop the services and remove the containers and default network:
+## Cách Dừng & Dọn dẹp Hệ thống
+Để dừng các dịch vụ và xóa container cùng mạng nội bộ (network) mặc định:
 ```bash
 docker compose down
 ```
 
-To stop the services and also remove the persistent data volume (this deletes all stored logs):
+Để dừng các dịch vụ và XÓA LUÔN dữ liệu lưu trữ (thao tác này sẽ xóa sạch toàn bộ log đã lưu):
 ```bash
 docker compose down -v
 ```
